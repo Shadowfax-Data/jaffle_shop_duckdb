@@ -1,0 +1,8 @@
+setup:
+  - echo "Running setup commands"
+  - echo "Installing dependencies"
+
+
+guidelines:
+  - `jaffle_shop` is a fictional ecommerce store. This dbt project transforms raw data from an app database into a customers and orders model ready for analytics.
+  - This repository contains seeds. You will have an error if you try to do `dbt run` without running `dbt seed` first.
