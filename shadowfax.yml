@@ -15,3 +15,7 @@ tools:
     Name: my-tool-2
     Description: my-tool-2 is a tool for building models
     Example: my-tool-2 build
+
+env_vars:
+  FIRST_ENV_VAR: first_env_var_value
+  SECOND_ENV_VAR: second_env_var_value
