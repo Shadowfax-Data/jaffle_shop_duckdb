@@ -3,6 +3,15 @@ setup:
   - echo "Installing dependencies"
 
 
-guidelines:
-  - jaffle_shop is a fictional ecommerce store. This dbt project transforms raw data from an app database into a customers and orders model ready for analytics.
-  - This repository contains seeds. You will have an error if you try to do `dbt run` without running `dbt seed` first.
+instruction: |
+  Make sure to run `dbt seed` before running `dbt run`
+
+tools:
+  - |
+    Name: my-tool
+    Description: my-tool is a tool that enables data analysts and engineers to transform data in their warehouse more effectively.
+    Example: my-tool run
+  - |
+    Name: my-tool-2
+    Description: my-tool-2 is a tool for building models
+    Example: my-tool-2 build
