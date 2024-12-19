@@ -1,6 +1,21 @@
 version: 2
 
 models:
+  - name: top_customers
+    description: This table shows customers ranked by their number of orders
+    columns:
+      - name: customer_id
+        description: This is a unique identifier for a customer
+        tests:
+          - not_null
+          - relationships:
+              to: ref('customers')
+              field: customer_id
+
+      - name: number_of_orders
+        description: Count of the number of orders placed by this customer
+        tests:
+          - not_null
   - name: customers
     description: This table has basic information about a customer, as well as some derived facts based on a customer's orders
 
