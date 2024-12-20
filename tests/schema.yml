@@ -1,0 +1,18 @@
+version: 2
+
+data_tests:
+  - name: assert_total_amount_greater_than_average
+    description: >
+      Verifies that total_order_amount is always greater than or equal to average_order_value
+      for each customer. This is a fundamental mathematical relationship that must hold true
+      since average_order_value is calculated as total_order_amount divided by number of orders.
+
+  - name: assert_average_order_value_positive
+    description: >
+      Ensures that average_order_value is always greater than zero. Since we're dealing with
+      sales data, a customer's average order value should never be zero or negative.
+
+  - name: assert_total_order_amount_positive
+    description: >
+      Ensures that total_order_amount is always greater than zero. Since we're dealing with
+      sales data, a customer's total order amount should never be zero or negative.
