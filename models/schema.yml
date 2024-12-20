@@ -95,3 +95,26 @@ models:
         description: Count of the total number of orders placed by this customer
         tests:
           - not_null
+
+  - name: customer_lifetime_value
+    description: This table calculates customer lifetime value metrics including total spend and average order value per customer
+
+    columns:
+      - name: customer_id
+        description: Unique identifier for a customer
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('customers')
+              field: customer_id
+
+      - name: total_order_amount
+        description: Total amount (AUD) spent by the customer across all their orders
+        tests:
+          - not_null
+
+      - name: average_order_value
+        description: Average amount (AUD) spent per order by the customer
+        tests:
+          - not_null
