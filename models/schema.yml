@@ -1,6 +1,34 @@
 version: 2
 
+data_tests:
+  - name: assert_customer_amounts_not_negative
+    description: >
+      Ensures that total_order_amount and average_order_value in the customer_lifetime_value model
+      are not negative values. Returns failing records where either amount is less than 0.
+
 models:
+  - name: customer_lifetime_value
+    description: This table contains customer lifetime value metrics including total spend and average order value
+
+    columns:
+      - name: customer_id
+        description: Unique identifier for a customer
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('customers')
+              field: customer_id
+
+      - name: total_order_amount
+        description: Total amount (AUD) spent by the customer across all orders
+        tests:
+          - not_null
+
+      - name: average_order_value
+        description: Average amount (AUD) spent per order by the customer
+        tests:
+          - not_null
   - name: customers
     description: This table has basic information about a customer, as well as some derived facts based on a customer's orders
 
