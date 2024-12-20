@@ -1,0 +1,8 @@
+version: 2
+
+data_tests:
+  - name: assert_customer_lifetime_value_amounts_not_negative
+    description: >
+      Ensures that both total_order_amount and average_order_value in the
+      customer_lifetime_value model are not negative values, as these represent
+      monetary amounts that should always be zero or positive.
