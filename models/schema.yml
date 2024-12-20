@@ -1,6 +1,74 @@
 version: 2
 
+sources:
+  - name: jaffle_shop
+    description: Raw data from the Jaffle Shop application
+    schema: jaffle_shop
+    tables:
+      - name: raw_customers
+        description: Raw customer data
+        columns:
+          - name: id
+            description: Primary key for raw customers
+            tests:
+              - unique
+              - not_null
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "count(*) > 0"
+
+data_tests:
+  - name: assert_customer_lifetime_value_total_amount_positive
+    description: >
+      Ensures that total_order_amount in customer_lifetime_value model is not NULL.
+      According to business rules, customers without orders should have total_order_amount = 0,
+      while customers with orders (including refunds) can have any value including negative.
+
+  - name: assert_customer_lifetime_value_average_value_positive
+    description: >
+      Ensures that average_order_value in customer_lifetime_value model follows business rules:
+      1. Customers with no orders should have NULL average_order_value
+      2. Customers with orders must have a non-NULL average_order_value (can be negative due to refunds)
+      This test helps catch data anomalies and incorrect NULL handling.
+
 models:
+  - name: customer_lifetime_value
+    description: >
+      This table contains customer lifetime value metrics including total spend and average order value.
+      Business rules:
+      - All customers are included in this table, even those without any orders (they will have 0 for amounts)
+      - Order amounts include both positive (purchases) and negative (refunds) transactions
+      - Amounts are stored in AUD (Australian Dollars)
+      - Total order amount is the sum of all transactions (purchases and refunds)
+      - Average order value is calculated as total_order_amount divided by number of orders
+      - Orders in any status ('placed', 'shipped', 'completed', 'return_pending', 'returned') are included
+      - All payment methods (credit card, coupon, bank transfer, gift card) are included in the calculations
+
+    columns:
+      - name: customer_id
+        description: >
+          Unique identifier for a customer. This ID can be used to join with the customers table
+          for additional customer information like name and first order date.
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('customers')
+              field: customer_id
+
+      - name: total_order_amount
+        description: >
+          Total amount (AUD) spent by the customer across all orders, including both purchases and refunds.
+          Can be zero for customers with no orders, or negative if total refunds exceed total purchases.
+        tests:
+          - not_null
+
+      - name: average_order_value
+        description: >
+          Average amount (AUD) spent per order by the customer, calculated as total_order_amount divided by number of orders.
+          Will be NULL for customers with no orders, can be negative if customer has more refunds than purchases.
+        tests:
+          - not_null
   - name: customers
     description: This table has basic information about a customer, as well as some derived facts based on a customer's orders
 
