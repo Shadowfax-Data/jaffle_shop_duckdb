@@ -80,3 +80,20 @@ models:
         description: Amount of the order (AUD) paid for by gift card
         tests:
           - not_null
+
+  - name: top_customers
+    description: >
+      This table contains a comprehensive list of all customers and their order counts,
+      sorted by number of orders in descending order. It is useful for identifying
+      the most active customers and analyzing customer engagement patterns.
+      The data is derived from the customers model's customer_orders CTE.
+    columns:
+      - name: customer_id
+        description: This is a unique identifier for a customer, matches the customer_id in the customers table
+        tests:
+          - not_null
+          - unique
+      - name: number_of_orders
+        description: Total count of orders placed by the customer, guaranteed to be non-negative
+        tests:
+          - not_null
