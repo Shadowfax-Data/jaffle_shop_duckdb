@@ -82,13 +82,21 @@ models:
           - not_null
 
   - name: top_customers
-    description: This table ranks customers based on their total number of orders, showing the most active customers first
+    description: >
+      This table ranks all customers based on their total number of orders, showing the most active customers first.
+      Results are ordered by number_of_orders in descending order, with customer_id as a secondary sort key to ensure
+      consistent ordering when there are ties in the order count. The table is materialized as a table rather than
+      a view for better query performance since it contains aggregated data.
 
     columns:
       - name: customer_id
-        description: Unique identifier for a customer
+        description: >
+          Unique identifier for a customer. Used as a secondary sort key to provide
+          consistent ordering when multiple customers have the same number of orders.
         tests:
           - not_null
 
       - name: number_of_orders
-        description: Total count of orders placed by the customer, used for ranking customers by activity
+        description: >
+          Total count of orders placed by the customer. This is the primary sort key,
+          ordered in descending order to show the most active customers first.
