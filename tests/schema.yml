@@ -1,0 +1,7 @@
+version: 2
+
+data_tests:
+  - name: assert_top_customers_orders_positive
+    description: >
+      Ensures that the number_of_orders in top_customers is always greater than 0,
+      as customers must have at least one order to be included in this table.
