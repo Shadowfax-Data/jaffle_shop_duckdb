@@ -1,0 +1,19 @@
+version: 2
+
+data_tests:
+  - name: assert_top_customers_orders_positive
+    description: >
+      Validates that all customers in the top_customers model have a positive number of orders,
+      ensuring data quality and business logic integrity. In our business context, a customer
+      must have placed at least one order to be considered - zero orders would indicate a 
+      data anomaly, and negative orders are impossible and would signal a serious data issue.
+
+      The test queries the top_customers model and identifies any records where number_of_orders
+      is less than or equal to 0, which would violate our business rules. A passing test
+      returns zero rows, while any failing results would indicate potential issues such as:
+      - Data pipeline problems affecting order counts
+      - Bugs in the aggregation logic
+      - Possible data corruption in source tables
+
+      This validation is crucial for maintaining the integrity of our customer order analysis
+      and ensuring accurate reporting of customer activity.

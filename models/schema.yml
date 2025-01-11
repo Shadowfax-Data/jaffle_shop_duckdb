@@ -80,3 +80,16 @@ models:
         description: Amount of the order (AUD) paid for by gift card
         tests:
           - not_null
+
+  - name: top_customers
+    description: This table shows customers ranked by their total number of orders in descending order (highest to lowest), useful for identifying the most active customers
+
+    columns:
+      - name: customer_id
+        description: Unique identifier for each customer, used to rank customers by order frequency. Foreign key to customers table
+        tests:
+          - unique
+          - not_null
+
+      - name: number_of_orders
+        description: Count of the total number of orders placed by this customer
