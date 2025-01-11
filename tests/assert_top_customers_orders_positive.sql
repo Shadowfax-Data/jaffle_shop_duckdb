@@ -27,8 +27,16 @@
     - Possible data corruption in source tables
 */
 
+-- Main test query to identify any customers with invalid order counts
 select
+    -- Include customer_id to identify specific customers failing the validation
     customer_id,
+    -- Include number_of_orders to show the actual invalid value for debugging
     number_of_orders
+-- Reference the top_customers model which contains our aggregated customer order data
 from {{ ref('top_customers') }}
+-- Business rule validation: filter for records violating our positive order count requirement
+-- A value <= 0 would indicate either:
+--   a) 0 orders: invalid as customers must have at least one order to be included
+--   b) negative orders: impossible scenario indicating data corruption
 where number_of_orders <= 0
