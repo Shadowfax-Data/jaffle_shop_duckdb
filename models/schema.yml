@@ -86,7 +86,7 @@ models:
 
     columns:
       - name: customer_id
-        description: Primary key that uniquely identifies each customer in our ranking system. This field is essential for tracking customer purchase behavior and serves as the foundation for identifying our most valuable customers. As a foreign key to the customers table, it enables joining with detailed customer information. In the context of top customers analysis, this ID represents customers who demonstrate high engagement through frequent purchases, making it crucial for customer segmentation and loyalty program targeting
+        description: Unique identifier for each customer, used to rank customers by order frequency. Foreign key to customers table
         tests:
           - unique
           - not_null
