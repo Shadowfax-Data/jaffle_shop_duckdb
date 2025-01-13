@@ -80,3 +80,17 @@ models:
         description: Amount of the order (AUD) paid for by gift card
         tests:
           - not_null
+
+  - name: top_customers
+    description: This table shows customers ranked by their total number of orders in descending order
+
+    columns:
+      - name: customer_id
+        description: Unique identifier for a customer, references the customers table
+        tests:
+          - not_null
+
+      - name: number_of_orders
+        description: Total count of orders placed by the customer
+        tests:
+          - not_null
