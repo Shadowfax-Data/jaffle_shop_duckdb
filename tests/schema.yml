@@ -1,0 +1,17 @@
+version: 2
+
+data_tests:
+  - name: assert_customer_total_amount_not_negative
+    description: >
+      Total order amount for a customer should never be negative.
+      Returns records where total_order_amount < 0 to make the test fail.
+
+  - name: assert_customer_order_count_not_negative
+    description: >
+      Number of orders for a customer should never be negative.
+      Returns records where number_of_orders < 0 to make the test fail.
+
+  - name: assert_customer_order_dates_valid
+    description: >
+      A customer's most recent order date should never be earlier than their first order date.
+      Returns records where most_recent_order < first_order to make the test fail.
