@@ -80,3 +80,35 @@ models:
         description: Amount of the order (AUD) paid for by gift card
         tests:
           - not_null
+
+  - name: monthly_top_spenders
+    description: This table identifies the highest spending customers for each month, including their spending details and rankings
+    tests:
+      - unique:
+          column_name: "month"
+          name: unique_month_combination
+
+    columns:
+      - name: month
+        description: The first day of the month for which the spending is calculated (UTC)
+        tests:
+          - not_null
+
+      - name: customer_id
+        description: Foreign key to the customers table, identifying the customer
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+
+      - name: first_name
+        description: Customer's first name. PII.
+
+      - name: last_name
+        description: Customer's last name. PII.
+
+      - name: monthly_spend
+        description: Total amount (AUD) spent by the customer in the given month
+        tests:
+          - not_null
