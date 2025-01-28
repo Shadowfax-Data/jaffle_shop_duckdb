@@ -2,30 +2,70 @@ version: 2
 
 models:
   - name: stg_customers
+    description: Staged customer data from raw customers
     columns:
       - name: customer_id
+        description: Primary key for customers
         tests:
           - unique
+          - not_null
+      - name: first_name
+        description: Customer's first name
+        tests:
+          - not_null
+      - name: last_name
+        description: Customer's last name
+        tests:
           - not_null
 
   - name: stg_orders
+    description: Staged order data
     columns:
       - name: order_id
+        description: Primary key for orders
         tests:
           - unique
           - not_null
-      - name: status
+      - name: customer_id
+        description: Foreign key to stg_customers
         tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: order_date
+        description: Date when the order was placed
+        tests:
+          - not_null
+      - name: status
+        description: Current status of the order
+        tests:
+          - not_null
           - accepted_values:
               values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
 
   - name: stg_payments
+    description: Staged payment data
     columns:
       - name: payment_id
+        description: Primary key for payments
         tests:
           - unique
           - not_null
-      - name: payment_method
+      - name: order_id
+        description: Foreign key to stg_orders
         tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: payment_method
+        description: Method of payment
+        tests:
+          - not_null
           - accepted_values:
               values: ['credit_card', 'coupon', 'bank_transfer', 'gift_card']
+      - name: amount
+        description: Payment amount in dollars
+        tests:
+          - not_null

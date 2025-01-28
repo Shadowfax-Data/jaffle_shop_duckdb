@@ -1,0 +1,15 @@
+version: 2
+
+data_tests:
+  - name: assert_customer_order_dates_are_valid
+    description: >
+      Ensures that for each customer, their most_recent_order date is not earlier than
+      their first_order date. This test fails if any customer has a most_recent_order
+      that predates their first_order, which would indicate a data quality issue.
+
+  - name: assert_customer_total_amount_equals_orders
+    description: >
+      Validates that the total_order_amount in the customers table matches the sum of
+      all order amounts for each customer in the orders table. This test allows for
+      small rounding differences (up to 0.01) to account for floating-point arithmetic.
+      Any larger discrepancy indicates a mismatch that needs investigation.

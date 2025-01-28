@@ -1,0 +1,7 @@
+version: 2
+
+data_tests:
+  - name: assert_stg_payments_amount_is_positive
+    description: >
+      Payment amounts should always be positive numbers.
+      This test returns records where amount < 0 to make the test fail.
