@@ -19,15 +19,22 @@ models:
 
       - name: first_order
         description: Date (UTC) of a customer's first order
+        tests:
+          - assert_dates_ordered:
+              compare_to: most_recent_order
 
       - name: most_recent_order
         description: Date (UTC) of a customer's most recent order
 
       - name: number_of_orders
         description: Count of the number of orders a customer has placed
+        tests:
+          - assert_non_negative
 
       - name: total_order_amount
         description: Total value (AUD) of a customer's orders
+        tests:
+          - assert_non_negative
 
   - name: orders
     description: This table has basic information about orders, as well as some derived facts based on payments
