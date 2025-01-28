@@ -3,6 +3,9 @@ version: 2
 models:
   - name: customers
     description: This table has basic information about a customer, as well as some derived facts based on a customer's orders
+    tests:
+      - assert_customer_order_dates_are_valid
+      - assert_customer_total_amount_equals_orders
 
     columns:
       - name: customer_id
@@ -13,21 +16,31 @@ models:
 
       - name: first_name
         description: Customer's first name. PII.
+        tests:
+          - not_null
 
       - name: last_name
         description: Customer's last name. PII.
+        tests:
+          - not_null
 
       - name: first_order
-        description: Date (UTC) of a customer's first order
+        description: Date (UTC) of a customer's first order. Will be NULL if customer has not placed any orders.
 
       - name: most_recent_order
-        description: Date (UTC) of a customer's most recent order
+        description: Date (UTC) of a customer's most recent order. Will be NULL if customer has not placed any orders.
 
       - name: number_of_orders
         description: Count of the number of orders a customer has placed
+        tests:
+          - not_null:
+              where: "number_of_orders < 0"
 
-      - name: total_order_amount
-        description: Total value (AUD) of a customer's orders
+      - name: customer_lifetime_value
+        description: Total value (AUD) of a customer's orders across their entire history
+        tests:
+          - not_null:
+              where: "customer_lifetime_value < 0"
 
   - name: orders
     description: This table has basic information about orders, as well as some derived facts based on payments
