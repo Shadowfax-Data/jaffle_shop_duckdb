@@ -1,5 +1,11 @@
 version: 2
 
+data_tests:
+  - name: assert_order_dates_are_valid
+    description: >
+      This test ensures that for each customer, their first_order date is not after their most_recent_order date.
+      This is a logical validation since a customer's first order cannot occur after their most recent order.
+
 models:
   - name: customers
     description: This table has basic information about a customer, as well as some derived facts based on a customer's orders
@@ -18,16 +24,38 @@ models:
         description: Customer's last name. PII.
 
       - name: first_order
-        description: Date (UTC) of a customer's first order
+        description: >
+          Date (UTC) of a customer's first order. This is calculated by taking the minimum order_date 
+          from the customer's order history. This field helps in understanding customer acquisition timing 
+          and calculating customer tenure.
+        tests:
+          - not_null
 
       - name: most_recent_order
-        description: Date (UTC) of a customer's most recent order
+        description: >
+          Date (UTC) of a customer's most recent order. This is calculated by taking the maximum order_date 
+          from the customer's order history. This field is crucial for identifying active customers and 
+          analyzing purchase frequency patterns.
+        tests:
+          - not_null
 
       - name: number_of_orders
-        description: Count of the number of orders a customer has placed
+        description: >
+          Count of the total number of orders a customer has placed. This is calculated by counting all 
+          distinct orders associated with the customer_id. This metric is key for customer segmentation 
+          and identifying high-frequency purchasers.
+        tests:
+          - not_null
+          - positive_value
 
       - name: total_order_amount
-        description: Total value (AUD) of a customer's orders
+        description: >
+          Total monetary value (AUD) of all orders placed by a customer. This is calculated by summing 
+          the amount of all orders (including all payment methods) for each customer. This metric is 
+          essential for customer lifetime value analysis and customer tier classification.
+        tests:
+          - not_null
+          - positive_value
 
   - name: orders
     description: This table has basic information about orders, as well as some derived facts based on payments
