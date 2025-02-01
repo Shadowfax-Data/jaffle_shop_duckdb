@@ -24,7 +24,7 @@ customer_orders as (
         min(order_date) as first_order,
         max(order_date) as most_recent_order,
         count(order_id) as number_of_orders
-    from orders
+    from {{ ref('stg_orders') }}
 
     group by customer_id
 
@@ -36,9 +36,9 @@ customer_payments as (
         orders.customer_id,
         sum(amount) as total_amount
 
-    from payments
+    from {{ ref('stg_payments') }} as payments
 
-    left join orders on
+    left join {{ ref('stg_orders') }} as orders on
          payments.order_id = orders.order_id
 
     group by orders.customer_id

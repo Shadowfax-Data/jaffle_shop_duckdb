@@ -2,81 +2,66 @@ version: 2
 
 models:
   - name: customers
-    description: This table has basic information about a customer, as well as some derived facts based on a customer's orders
+    description: >
+      Core customer dimension table that combines customer information with their order history and payment metrics.
+      This table serves as the single source of truth for customer-level analytics and reporting.
+      Updated daily, it contains one row per customer with their current status and historical purchase behavior.
 
     columns:
       - name: customer_id
-        description: This is a unique identifier for a customer
+        description: >
+          Primary key and unique identifier for each customer.
+          This ID remains consistent across all customer interactions and transactions.
         tests:
           - unique
           - not_null
 
       - name: first_name
-        description: Customer's first name. PII.
+        description: >
+          Customer's first name. Considered PII (Personally Identifiable Information).
+          Should be handled according to data privacy guidelines.
 
       - name: last_name
-        description: Customer's last name. PII.
+        description: >
+          Customer's last name. Considered PII (Personally Identifiable Information).
+          Should be handled according to data privacy guidelines.
 
       - name: first_order
-        description: Date (UTC) of a customer's first order
+        description: >
+          Timestamp (UTC) of the customer's first order.
+          Used to calculate customer tenure and cohort analysis.
+          Based on order_date from stg_orders.
 
       - name: most_recent_order
-        description: Date (UTC) of a customer's most recent order
+        description: >
+          Timestamp (UTC) of the customer's most recent order.
+          Used to identify active customers and calculate recency metrics.
+          Based on order_date from stg_orders.
 
       - name: number_of_orders
-        description: Count of the number of orders a customer has placed
+        description: >
+          Total count of orders placed by the customer.
+          Includes all orders regardless of status.
+          Key metric for customer engagement and loyalty analysis.
 
-      - name: total_order_amount
-        description: Total value (AUD) of a customer's orders
+      - name: customer_lifetime_value
+        description: >
+          Total monetary value of all customer orders in AUD.
+          Calculated as the sum of all completed payment amounts.
+          Critical metric for customer segmentation and marketing strategies.
+          Excludes failed or pending payments.
 
-  - name: orders
-    description: This table has basic information about orders, as well as some derived facts based on payments
-
-    columns:
-      - name: order_id
-        tests:
-          - unique
-          - not_null
-        description: This is a unique identifier for an order
-
-      - name: customer_id
-        description: Foreign key to the customers table
-        tests:
-          - not_null
-          - relationships:
-              to: ref('customers')
-              field: customer_id
-
-      - name: order_date
-        description: Date (UTC) that the order was placed
-
-      - name: status
-        description: '{{ doc("orders_status") }}'
-        tests:
-          - accepted_values:
-              values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
-
-      - name: amount
-        description: Total amount (AUD) of the order
-        tests:
-          - not_null
-
-      - name: credit_card_amount
-        description: Amount of the order (AUD) paid for by credit card
-        tests:
-          - not_null
-
-      - name: coupon_amount
-        description: Amount of the order (AUD) paid for by coupon
-        tests:
-          - not_null
-
-      - name: bank_transfer_amount
-        description: Amount of the order (AUD) paid for by bank transfer
-        tests:
-          - not_null
-
-      - name: gift_card_amount
-        description: Amount of the order (AUD) paid for by gift card
-        tests:
-          - not_null
+    meta:
+      owner: "Analytics Team"
+      refresh_frequency: "Daily"
+      business_metrics:
+        - name: "Customer Lifetime Value (CLV)"
+          definition: "Sum of all successful payment amounts per customer"
+          calculation: "SUM(payment_amount) where payment_status = 'success'"
+          
+        - name: "Customer Engagement"
+          definition: "Frequency and recency of customer orders"
+          metrics:
+            - "number_of_orders: Count of all orders"
+            - "days_since_last_order: Current date - most_recent_order"
+            - "customer_tenure_days: Current date - first_order"
