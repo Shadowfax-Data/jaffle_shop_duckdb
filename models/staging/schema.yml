@@ -2,30 +2,62 @@ version: 2
 
 models:
   - name: stg_customers
+    description: Cleaned and standardized customer data from raw source
     columns:
       - name: customer_id
+        description: Unique identifier for a customer
         tests:
           - unique
           - not_null
+      - name: first_name
+        description: Customer's first name (PII)
+      - name: last_name
+        description: Customer's last name (PII)
 
   - name: stg_orders
+    description: Cleaned and standardized order data from raw source
     columns:
       - name: order_id
+        description: Unique identifier for an order
         tests:
           - unique
           - not_null
+      - name: customer_id
+        description: Foreign key to customers table
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: order_date
+        description: Date (UTC) when the order was placed
       - name: status
+        description: Current status of the order
         tests:
           - accepted_values:
               values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
 
   - name: stg_payments
+    description: Cleaned and standardized payment data from raw source
     columns:
       - name: payment_id
+        description: Unique identifier for a payment
         tests:
           - unique
           - not_null
+      - name: order_id
+        description: Foreign key to orders table
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
       - name: payment_method
+        description: Method used for the payment
         tests:
           - accepted_values:
               values: ['credit_card', 'coupon', 'bank_transfer', 'gift_card']
+      - name: amount
+        description: Payment amount in AUD
+        tests:
+          - not_null
