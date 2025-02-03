@@ -409,6 +409,52 @@ To get up and running with this project:
     dbt docs serve
     ```
 
+## SQL Linting Standards
+
+This project uses SQLFluff for SQL code formatting and linting. The linting configuration ensures consistent code style across all SQL files in the project.
+
+### Linting Configuration
+
+The project's SQL linting rules are defined in `.sqlfluff` and include:
+
+- **Dialect**: Uses the dbt dialect for proper parsing of dbt-specific syntax
+- **Indentation**: 4 spaces
+- **Line Length**: Maximum 80 characters
+- **SQL Keywords**: Uppercase (e.g., SELECT, FROM, WHERE)
+- **Identifiers**: Lowercase for table and column names
+- **Trailing Commas**: Required for multi-line statements
+- **Aliasing**: Explicit AS keyword required for column aliases
+
+### Running the Linter
+
+To check your SQL files for linting issues:
+```shell
+sqlfluff lint models/
+```
+
+To automatically fix linting issues:
+```shell
+sqlfluff fix models/
+```
+
+### Excluded Files
+
+The `.sqlfluffignore` file excludes the following from linting:
+- Generated files in target/
+- dbt packages
+- Log files
+- Macro definitions
+- Analysis files
+- Test files
+- Snapshots
+
+### Best Practices
+
+1. Run SQLFluff before committing changes
+2. Fix any linting issues that are reported
+3. Use your IDE's SQLFluff integration when available (e.g., VS Code SQLFluff extension)
+4. Don't override linting rules without team discussion
+
 ## Running `build` steps independently
 
 1. Load the CSVs with the demo data set. This materializes the CSVs as tables in your target schema. Note that a typical dbt project **does not require this step** since dbt assumes your raw data is already in your warehouse.

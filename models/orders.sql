@@ -1,56 +1,64 @@
 {% set payment_methods = ['credit_card', 'coupon', 'bank_transfer', 'gift_card'] %}
 
-with orders as (
+WITH
+    orders AS (
 
-    select * from {{ ref('stg_orders') }}
+        SELECT * FROM {{ ref('stg_orders') }}
 
-),
+    ),
 
-payments as (
+    payments AS (
 
-    select * from {{ ref('stg_payments') }}
+        SELECT * FROM {{ ref('stg_payments') }}
 
-),
+    ),
 
-order_payments as (
+    order_payments AS (
 
-    select
-        order_id,
+        SELECT
+            order_id,
 
-        {% for payment_method in payment_methods -%}
-        sum(case when payment_method = '{{ payment_method }}' then amount else 0 end) as {{ payment_method }}_amount,
-        {% endfor -%}
+            {% for payment_method in payment_methods -%}
+                SUM(
+                    CASE
+                        WHEN
+                            payment_method = '{{ payment_method }}'
+                            THEN amount ELSE
+                            0
+                    END
+                ) AS {{ payment_method }}_amount,
+            {% endfor -%}
 
-        sum(amount) as total_amount
+            SUM(amount) AS total_amount
 
-    from payments
+        FROM payments
 
-    group by order_id
+        GROUP BY order_id
 
-),
+    ),
 
-final as (
+    final AS (
 
-    select
-        orders.order_id,
-        orders.customer_id,
-        orders.order_date,
-        orders.status,
+        SELECT
+            orders.order_id,
+            orders.customer_id,
+            orders.order_date,
+            orders.status,
 
-        {% for payment_method in payment_methods -%}
+            {% for payment_method in payment_methods -%}
 
-        order_payments.{{ payment_method }}_amount,
+                order_payments.{{ payment_method }}_amount,
 
-        {% endfor -%}
+            {% endfor -%}
 
-        order_payments.total_amount as amount
+            order_payments.total_amount AS amount
 
-    from orders
+        FROM orders
 
 
-    left join order_payments
-        on orders.order_id = order_payments.order_id
+            LEFT JOIN order_payments
+                ON orders.order_id = order_payments.order_id
 
-)
+    )
 
-select * from final
+SELECT * FROM final

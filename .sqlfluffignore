@@ -1,0 +1,8 @@
+target/
+dbt_packages/
+logs/
+*.log
+macros/
+analyses/
+tests/
+snapshots/
