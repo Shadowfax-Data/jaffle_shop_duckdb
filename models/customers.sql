@@ -1,69 +1,72 @@
-with customers as (
+WITH
+    customers AS (
 
-    select * from {{ ref('stg_customers') }}
+        SELECT * FROM {{ ref('stg_customers') }}
 
-),
+    ),
 
-orders as (
+    orders AS (
 
-    select * from {{ ref('stg_orders') }}
+        SELECT * FROM {{ ref('stg_orders') }}
 
-),
+    ),
 
-payments as (
+    payments AS (
 
-    select * from {{ ref('stg_payments') }}
+        SELECT * FROM {{ ref('stg_payments') }}
 
-),
+    ),
 
-customer_orders as (
+    customer_orders AS (
 
-        select
-        customer_id,
+        SELECT
+            customer_id,
 
-        min(order_date) as first_order,
-        max(order_date) as most_recent_order,
-        count(order_id) as number_of_orders
-    from orders
+            MIN(order_date) AS first_order,
+            MAX(order_date) AS most_recent_order,
+            COUNT(order_id) AS number_of_orders
+        FROM orders
 
-    group by customer_id
+        GROUP BY customer_id
 
-),
+    ),
 
-customer_payments as (
+    customer_payments AS (
 
-    select
-        orders.customer_id,
-        sum(amount) as total_amount
+        SELECT
+            orders.customer_id,
+            SUM(amount) AS total_amount
 
-    from payments
+        FROM payments
 
-    left join orders on
-         payments.order_id = orders.order_id
+            LEFT JOIN orders ON
+                payments.order_id = orders.order_id
 
-    group by orders.customer_id
+        GROUP BY orders.customer_id
 
-),
+    ),
 
-final as (
+    final AS (
 
-    select
-        customers.customer_id,
-        customers.first_name,
-        customers.last_name,
-        customer_orders.first_order,
-        customer_orders.most_recent_order,
-        coalesce(customer_orders.number_of_orders, 0) as number_of_orders,
-        coalesce(customer_payments.total_amount, 0) as customer_lifetime_value
+        SELECT
+            customers.customer_id,
+            customers.first_name,
+            customers.last_name,
+            customer_orders.first_order,
+            customer_orders.most_recent_order,
+            COALESCE(customer_orders.number_of_orders, 0) AS number_of_orders,
+            COALESCE(
+                customer_payments.total_amount, 0
+            ) AS customer_lifetime_value
 
-    from customers
+        FROM customers
 
-    left join customer_orders
-        on customers.customer_id = customer_orders.customer_id
+            LEFT JOIN customer_orders
+                ON customers.customer_id = customer_orders.customer_id
 
-    left join customer_payments
-        on customers.customer_id = customer_payments.customer_id
+            LEFT JOIN customer_payments
+                ON customers.customer_id = customer_payments.customer_id
 
-)
+    )
 
-select * from final
+SELECT * FROM final
