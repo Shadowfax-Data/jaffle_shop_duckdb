@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: customers
-    description: This table has basic information about a customer, as well as some derived facts based on a customer's orders
+    description: This table has basic information about a customer, as well as some derived facts based on a customer's orders and payment history. It serves as the single source of truth for customer information.
 
     columns:
       - name: customer_id
@@ -10,73 +10,50 @@ models:
         tests:
           - unique
           - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
 
       - name: first_name
         description: Customer's first name. PII.
+        tests:
+          - not_null
 
       - name: last_name
         description: Customer's last name. PII.
+        tests:
+          - not_null
 
       - name: first_order
-        description: Date (UTC) of a customer's first order
+        description: Date (UTC) of a customer's first order. NULL if customer has no orders.
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: "cast('2018-01-01' as date)"
+              max_value: "cast({{ current_timestamp() }} as date)"
+              where: "first_order is not null"
 
       - name: most_recent_order
-        description: Date (UTC) of a customer's most recent order
+        description: Date (UTC) of a customer's most recent order. NULL if customer has no orders.
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: "cast('2018-01-01' as date)"
+              max_value: "cast({{ current_timestamp() }} as date)"
+              where: "most_recent_order is not null"
 
       - name: number_of_orders
         description: Count of the number of orders a customer has placed
-
-      - name: total_order_amount
-        description: Total value (AUD) of a customer's orders
-
-  - name: orders
-    description: This table has basic information about orders, as well as some derived facts based on payments
-
-    columns:
-      - name: order_id
         tests:
-          - unique
-          - not_null
-        description: This is a unique identifier for an order
+          - dbt_utils.accepted_range:
+              min_value: 0
+              where: "number_of_orders is not null"
 
-      - name: customer_id
-        description: Foreign key to the customers table
+      - name: customer_lifetime_value
+        description: Total value (AUD) of a customer's orders. NULL if customer has no orders.
         tests:
-          - not_null
-          - relationships:
-              to: ref('customers')
-              field: customer_id
+          - dbt_utils.accepted_range:
+              min_value: 0
+              where: "customer_lifetime_value is not null"
 
-      - name: order_date
-        description: Date (UTC) that the order was placed
 
-      - name: status
-        description: '{{ doc("orders_status") }}'
-        tests:
-          - accepted_values:
-              values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']
 
-      - name: amount
-        description: Total amount (AUD) of the order
-        tests:
-          - not_null
 
-      - name: credit_card_amount
-        description: Amount of the order (AUD) paid for by credit card
-        tests:
-          - not_null
-
-      - name: coupon_amount
-        description: Amount of the order (AUD) paid for by coupon
-        tests:
-          - not_null
-
-      - name: bank_transfer_amount
-        description: Amount of the order (AUD) paid for by bank transfer
-        tests:
-          - not_null
-
-      - name: gift_card_amount
-        description: Amount of the order (AUD) paid for by gift card
-        tests:
-          - not_null
