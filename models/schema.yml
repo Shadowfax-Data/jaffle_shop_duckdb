@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: customers
-    description: This table has basic information about a customer, as well as some derived facts based on a customer's orders
+    description: This table has basic information about a customer, as well as some derived facts based on a customer's orders. It combines data from staging models to create a single source of truth for customer information.
 
     columns:
       - name: customer_id
@@ -13,21 +13,29 @@ models:
 
       - name: first_name
         description: Customer's first name. PII.
+        tests:
+          - not_null
 
       - name: last_name
         description: Customer's last name. PII.
+        tests:
+          - not_null
 
       - name: first_order
-        description: Date (UTC) of a customer's first order
+        description: Date (UTC) of a customer's first order. Null if customer has no orders.
 
       - name: most_recent_order
-        description: Date (UTC) of a customer's most recent order
+        description: Date (UTC) of a customer's most recent order. Null if customer has no orders.
 
       - name: number_of_orders
         description: Count of the number of orders a customer has placed
+        tests:
+          - not_null
 
       - name: total_order_amount
         description: Total value (AUD) of a customer's orders
+        tests:
+          - not_null
 
   - name: orders
     description: This table has basic information about orders, as well as some derived facts based on payments
