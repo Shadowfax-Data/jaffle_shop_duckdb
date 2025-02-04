@@ -1,5 +1,16 @@
 version: 2
 
+data_tests:
+  - name: assert_customer_order_dates_are_valid
+    description: >
+      Ensures that a customer's most_recent_order date is not earlier than their first_order date.
+      This test fails if any customer has a most_recent_order that comes before their first_order.
+
+  - name: assert_customer_metrics_are_positive
+    description: >
+      Ensures that customer metrics (number_of_orders and customer_lifetime_value) are not negative.
+      This test fails if any customer has negative values for these metrics.
+
 models:
   - name: customers
     description: This table has basic information about a customer, as well as some derived facts based on a customer's orders
@@ -13,21 +24,33 @@ models:
 
       - name: first_name
         description: Customer's first name. PII.
+        tests:
+          - not_null
 
       - name: last_name
         description: Customer's last name. PII.
+        tests:
+          - not_null
 
       - name: first_order
         description: Date (UTC) of a customer's first order
+        tests:
+          - not_null
 
       - name: most_recent_order
         description: Date (UTC) of a customer's most recent order
+        tests:
+          - not_null
 
       - name: number_of_orders
         description: Count of the number of orders a customer has placed
+        tests:
+          - not_null
 
-      - name: total_order_amount
-        description: Total value (AUD) of a customer's orders
+      - name: customer_lifetime_value
+        description: Total value (AUD) of a customer's orders (customer lifetime value)
+        tests:
+          - not_null
 
   - name: orders
     description: This table has basic information about orders, as well as some derived facts based on payments
