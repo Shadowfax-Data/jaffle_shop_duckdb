@@ -1,22 +1,15 @@
 with source as (
-
-    {#-
-    Normally we would select from the table here, but we are using seeds to load
-    our data in this project
-    #}
     select * from {{ ref('raw_customers') }}
-
 ),
 
-renamed as (
-
+transformed as (
     select
         id as customer_id,
-        first_name,
-        last_name
-
+        trim(first_name) as first_name,
+        trim(last_name) as last_name,
+        trim(first_name) || ' ' || trim(last_name) as full_name,
+        current_timestamp as created_at
     from source
-
 )
 
-select * from renamed
+select * from transformed

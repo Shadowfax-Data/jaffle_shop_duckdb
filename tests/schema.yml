@@ -1,0 +1,22 @@
+version: 2
+
+data_tests:
+  - name: assert_customer_total_amount_equals_orders_sum
+    description: >
+      Validates that the total_order_amount in the customers model exactly matches
+      the sum of order amounts for each customer in the orders model.
+      A small tolerance (0.01) is allowed for rounding differences.
+
+  - name: assert_customer_order_count_matches
+    description: >
+      Ensures that the number_of_orders in the customers model exactly matches
+      the count of orders for each customer in the orders model.
+
+  - name: assert_customer_metrics_validity
+    description: >
+      Validates various business rules for customer metrics:
+      1. first_order and most_recent_order should be null if number_of_orders = 0
+      2. first_order and most_recent_order should not be null if number_of_orders > 0
+      3. most_recent_order should be >= first_order when both are not null
+      4. total_order_amount should be 0 when number_of_orders = 0
+      5. total_order_amount should be > 0 when number_of_orders > 0
