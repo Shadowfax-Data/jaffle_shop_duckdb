@@ -1,3 +1,16 @@
 [sqlfluff]
-
 dialect = ansi
+templater = dbt
+max_line_length = 80
+
+[sqlfluff:indentation]
+tab_space_size = 4
+indent_unit = space
+
+[sqlfluff:rules:capitalisation]
+keywords = upper
+functions = upper
+identifiers = lower
+
+[sqlfluff:rules:structure]
+force_explicit_columns = true

@@ -1,67 +1,79 @@
-with customers as (
-
-    select * from {{ ref('stg_customers') }}
-
-),
-
-orders as (
-
-    select * from {{ ref('stg_orders') }}
-
-),
-
-payments as (
-
-    select * from {{ ref('stg_payments') }}
-
-),
-
-customer_orders as (
-
-        select
+WITH customers AS (
+    SELECT
         customer_id,
-        min(order_date) as first_order,
-        max(order_date) as most_recent_order,
-        count(order_id) as number_of_orders
-    from orders
-    group by customer_id
-
+        first_name,
+        last_name
+    FROM {{ ref('stg_customers') }}
 ),
 
-customer_payments as (
+orders AS (
+    SELECT
+        customer_id,
+        order_id,
+        order_date
+    FROM {{ ref('stg_orders') }}
+),
 
-    select
+payments AS (
+    SELECT
+        order_id,
+        amount
+    FROM {{ ref('stg_payments') }}
+),
+
+customer_orders AS (
+    SELECT
+        customer_id,
+        MIN(order_date) AS first_order,
+        MAX(order_date) AS most_recent_order,
+        COUNT(order_id) AS number_of_orders
+    FROM orders
+    GROUP BY customer_id
+),
+
+customer_payments AS (
+    SELECT
         orders.customer_id,
-        sum(amount) as total_amount
-
-    from payments
-
-    left join orders on
-         payments.order_id = orders.order_id
-
-    group by orders.customer_id
-
+        SUM(payments.amount) AS total_amount
+    FROM payments
+    LEFT JOIN orders ON payments.order_id = orders.order_id
+    GROUP BY orders.customer_id
 ),
 
-final as (
-
-    select
+final AS (
+    SELECT
         customers.customer_id,
         customers.first_name,
         customers.last_name,
-        coalesce(customer_orders.first_order, '1900-01-01'::timestamp) as first_order,
-        coalesce(customer_orders.most_recent_order, '1900-01-01'::timestamp) as most_recent_order,
-        coalesce(customer_orders.number_of_orders, 0) as number_of_orders,
-        coalesce(customer_payments.total_amount, 0) as customer_lifetime_value
-
-    from customers
-
-    left join customer_orders
-        on customers.customer_id = customer_orders.customer_id
-
-    left join customer_payments
-        on customers.customer_id = customer_payments.customer_id
-
+        COALESCE(
+            customer_orders.first_order,
+            '1900-01-01'::TIMESTAMP
+        ) AS first_order,
+        COALESCE(
+            customer_orders.most_recent_order,
+            '1900-01-01'::TIMESTAMP
+        ) AS most_recent_order,
+        COALESCE(
+            customer_orders.number_of_orders,
+            0
+        ) AS number_of_orders,
+        COALESCE(
+            customer_payments.total_amount,
+            0
+        ) AS customer_lifetime_value
+    FROM customers
+    LEFT JOIN customer_orders
+        ON customers.customer_id = customer_orders.customer_id
+    LEFT JOIN customer_payments
+        ON customers.customer_id = customer_payments.customer_id
 )
 
-select * from final
+SELECT
+    customer_id,
+    first_name,
+    last_name,
+    first_order,
+    most_recent_order,
+    number_of_orders,
+    customer_lifetime_value
+FROM final
