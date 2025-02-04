@@ -1,0 +1,12 @@
+version: 2
+
+data_tests:
+  - name: assert_customer_total_amount_positive
+    description: >
+      Verifies that the total_order_amount for each customer is not negative.
+      A negative total would indicate an error in order amount calculations.
+
+  - name: assert_customer_order_count_accuracy
+    description: >
+      Verifies that the number_of_orders in the customers table matches
+      the actual count of orders for each customer in the orders table.
